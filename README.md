@@ -35,7 +35,4 @@ This project is developed as part of an academic mini project submission.
 - Maven
 - IntelliJ IDEA
 
----
-
-## 📂 Project Structure
 
