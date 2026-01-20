@@ -1,21 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Leave Requests</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            margin: auto;
+            width: 80%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        a:hover {
+            color: darkblue;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+
+<body>
+
 <h2>Leave Requests</h2>
 
-<table border="1">
+<table>
     <tr>
+        <th>Id</th>
+        <th>Roll No</th>
         <th>Name</th>
         <th>Reason</th>
+        <th>Start Date</th>
+        <th>End Date</th>
         <th>Status</th>
         <th>Action</th>
     </tr>
 
     <tr th:each="leave : ${leaves}">
-        <td th:text="${leave.employeeName}"></td>
+        <td th:text="${leave.id}"></td>
+        <td th:text="${leave.rollNo}"></td>
+        <td th:text="${leave.name}"></td>
         <td th:text="${leave.reason}"></td>
+        <td th:text="${leave.startDate}"></td>
+        <td th:text="${leave.endDate}"></td>
         <td th:text="${leave.status}"></td>
 
         <td>
             <span th:if="${leave.status == 'PENDING'}">
-                <a th:href="@{/approve/{id}(id=${leave.id})}">Approve</a> |
+                <a th:href="@{/approve/{id}(id=${leave.id})}">Approve</a>
+                |
                 <a th:href="@{/reject/{id}(id=${leave.id})}">Reject</a>
             </span>
 
@@ -25,3 +96,6 @@
         </td>
     </tr>
 </table>
+<a href="/" class="back-link">⬅ Back to Home</a>
+</body>
+</html>

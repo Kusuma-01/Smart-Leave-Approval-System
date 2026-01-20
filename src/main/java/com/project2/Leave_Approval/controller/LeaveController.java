@@ -14,59 +14,60 @@ public class LeaveController {
     @Autowired
     private LeaveService service;
 
-    // Entry page
+    // HOME PAGE
     @GetMapping("/")
-    public String loginPage() {
-        return "login";
+    public String home() {
+        return "index";
     }
 
-    // Student login
+    // STUDENT FORM PAGE
     @GetMapping("/student")
-    public String student(HttpSession session) {
-        session.setAttribute("role", "STUDENT");
-        return "redirect:/apply";
+    public String studentForm(Model model) {
+        model.addAttribute("leave", new LeaveRequest());
+        return "student_form";
     }
 
-    // HOD login
-    @PostMapping("/hodLogin")
-    public String hodLogin(@RequestParam String username,
-                           @RequestParam String password,
-                           HttpSession session,
-                           Model model) {
+    // SAVE LEAVE (SUBMIT)
+    @PostMapping("/save")
+    public String saveLeave(@ModelAttribute LeaveRequest leave) {
+        service.saveLeave(leave);
+        return "redirect:/";   // ✅ redirects to home
+    }
 
-        if (username.equals("hod") && password.equals("admin123")) {
-            session.setAttribute("role", "HOD");
-            return "redirect:/leaves";
+    // ADMIN LOGIN PAGE
+    @GetMapping("/admin")
+    public String adminLogin() {
+        return "admin_login";
+    }
+
+    // ADMIN AUTH
+    @PostMapping("/adminLogin")
+    public String adminAuth(@RequestParam String username,
+                            @RequestParam String password,
+                            HttpSession session,
+                            Model model) {
+
+        if ("hod".equals(username) && "hod123".equals(password)) {
+            session.setAttribute("role", "ADMIN");
+            return "redirect:/leaves";   // ✅ REDIRECT HERE
         }
 
-        model.addAttribute("error", "Invalid HOD credentials");
-        return "login";
+        model.addAttribute("error", "Invalid credentials");
+        return "admin_login";
     }
 
-    // Apply leave
-    @GetMapping("/apply")
-    public String apply(Model model) {
-        model.addAttribute("leave", new LeaveRequest());
-        return "apply_leave";
-    }
-
-    @PostMapping("/save")
-    public String save(@ModelAttribute LeaveRequest leave) {
-        service.saveLeave(leave);
-        return "redirect:/apply";
-    }
-
-    // View leaves
+    // VIEW LEAVES
     @GetMapping("/leaves")
-    public String view(Model model, HttpSession session) {
+    public String viewLeaves(Model model, HttpSession session) {
         model.addAttribute("leaves", service.getAllLeaves());
         model.addAttribute("role", session.getAttribute("role"));
         return "leave_list";
     }
 
+
     @GetMapping("/approve/{id}")
     public String approve(@PathVariable Long id, HttpSession session) {
-        if ("HOD".equals(session.getAttribute("role"))) {
+        if ("ADMIN".equals(session.getAttribute("role"))) {
             service.approve(id);
         }
         return "redirect:/leaves";
@@ -74,7 +75,7 @@ public class LeaveController {
 
     @GetMapping("/reject/{id}")
     public String reject(@PathVariable Long id, HttpSession session) {
-        if ("HOD".equals(session.getAttribute("role"))) {
+        if ("ADMIN".equals(session.getAttribute("role"))) {
             service.reject(id);
         }
         return "redirect:/leaves";

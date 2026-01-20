@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LeaveService {
@@ -13,24 +14,52 @@ public class LeaveService {
     @Autowired
     private LeaveRepository repository;
 
+    /* ======================
+       SAVE NEW LEAVE
+       ====================== */
     public void saveLeave(LeaveRequest leave) {
-        leave.setStatus("PENDING");
+        leave.setStatus("PENDING");   // default
         repository.save(leave);
     }
 
+    /* ======================
+       FETCH ALL LEAVES
+       ====================== */
     public List<LeaveRequest> getAllLeaves() {
         return repository.findAll();
     }
 
+    /* ======================
+       APPROVE LEAVE
+       ====================== */
     public void approve(Long id) {
-        LeaveRequest leave = repository.findById(id).get();
-        leave.setStatus("APPROVED");
-        repository.save(leave);
+        Optional<LeaveRequest> optionalLeave = repository.findById(id);
+
+        if (optionalLeave.isPresent()) {
+            LeaveRequest leave = optionalLeave.get();
+
+            // Prevent re-approval
+            if ("PENDING".equals(leave.getStatus())) {
+                leave.setStatus("APPROVED");
+                repository.save(leave);
+            }
+        }
     }
 
+    /* ======================
+       REJECT LEAVE
+       ====================== */
     public void reject(Long id) {
-        LeaveRequest leave = repository.findById(id).get();
-        leave.setStatus("REJECTED");
-        repository.save(leave);
+        Optional<LeaveRequest> optionalLeave = repository.findById(id);
+
+        if (optionalLeave.isPresent()) {
+            LeaveRequest leave = optionalLeave.get();
+
+            // Prevent re-reject
+            if ("PENDING".equals(leave.getStatus())) {
+                leave.setStatus("REJECTED");
+                repository.save(leave);
+            }
+        }
     }
 }
